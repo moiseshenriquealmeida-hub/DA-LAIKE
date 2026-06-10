@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+
+
+<html lang="pt-br">
+    <head>
+        <title>DA LAIKE</title>
+        <meta charset="UTF-8">
+        <meta name="VIEW" content="width=1280 initial-scale=1.0">
+        <link href="./style.css" rel="stylesheet" type="text/css" media="all">
+    </head>
+    <body>
+        <script>
+            const LaikeBtn = document.createElement("button")
+            const DesLaikeBtn = document.createElement("button")
+            const LaikeText = document.createElement("h6")
+            var Delta = 0
+            var OldTime = 0
+            var LaikeBtnSizeAdd = 0
+            var LaikePermaBtnSizeAdd = 0
+            var DesLaikeBtnSizeAdd = 0
+            var PermaDesLaikeBtnSizeAdd = 0
+            var BgHue = 127
+            var WantedBgHue = 127
+            var Laikes = 0
+            var Time = 0
+            var AddTexts = []
+
+
+            class AddText {
+                constructor(x, y, gained) {
+                    this.x = x
+                    this.y = y
+                    this.velX = GetRandom(-600, 600)
+                    this.velY = -600
+                    this.gained = gained
+                    this.scale = 2
+
+
+                    this.element = document.createElement("div")
+                    this.element.textContent = (gained > 0 ? "+" : "") + gained
+
+
+                    this.element.style.position = "absolute"
+                    this.element.style.fontSize = "64px"
+                    this.element.style.webkitTextStroke = "2px black"
+                    this.element.style.textAlign = "center"
+                    this.element.style.transform = "translate(-50%, -50%)"
+                    this.element.style.verticalAlign = "center"
+                    this.element.style.fontFamily = "Vhs Gothic"
+                    this.element.style.color = gained > 0 ? "lime" : "red"
+                    this.element.style.textShadow = "2px 2px 0px black"
+                    this.element.style.pointerEvents = "none"
+                    this.element.style.zIndex = "100"
+
+
+                    document.body.appendChild(this.element)
+
+
+                    AddTexts.push(this)
+                }
+
+                
+                Update() {
+                    this.velY += 1000 * Delta
+                    this.velX = SLerp(this.velX, 0, 2)
+
+
+                    if (this.y > window.innerHeight + 100) {
+                        this.element.remove()
+
+                    
+                        const index = AddTexts.indexOf(this)
+
+
+                        if (index > -1) {
+                            AddTexts.splice(index, 1)
+                        }
+
+
+                        return
+                    }
+
+
+                    if (this.velY > 0) {this.scale = SLerp(this.scale, 1, 1)}
+
+
+                    this.element.style.fontSize = String((64 + (this.velY < 0 ? ((this.velY * 0.1)) : 0)) * this.scale) + "px"
+
+
+                    this.x += this.velX * Delta
+                    this.y += this.velY * Delta
+                }
+
+
+                Draw() {
+                    this.element.style.rotate = String(this.velX * 0.1) + "deg"
+                    this.element.style.left = String(this.x) + "px"
+                    this.element.style.top = String(this.y) + "px"
+                }
+            }
+
+
+            LaikeBtn.textContent = "LAIKE"
+            LaikeBtn.style.background = "hsl(127, 100%, 50%)"
+            LaikeBtn.style.webkitTextStroke = "2px black"
+            DesLaikeBtn.style.background = "red"
+            DesLaikeBtn.textContent = "DESLAIKE"
+            DesLaikeBtn.style.webkitTextStroke = "2px black"
+            LaikeText.textContent = "LAIKES: " + String(Laikes)
+
+
+            LaikeText.style.height = "64px"
+            LaikeText.style.top = "64px"
+            LaikeText.style.marginTop = "64px"
+            LaikeText.style.textShadow = "16px 16px black"
+
+
+            //EU DEVERIA TER ESCRITO UM CODIGO MELHOR
+
+
+            LaikeBtn.onmouseenter = function() {
+                LaikePermaBtnSizeAdd = 32
+            }
+            LaikeBtn.onmouseout = function() {
+                LaikePermaBtnSizeAdd = 0
+            }
+            LaikeBtn.onmousedown = function() {
+                LaikePermaBtnSizeAdd = -32
+                LaikeBtn.style.rotate = "0deg"
+            }
+            LaikeBtn.onmousemove = function(event) {
+                if (event instanceof MouseEvent) {
+                    LaikeBtn.style.rotate = String(Number(LaikeBtn.style.rotate.replace("deg", "")) + (event.movementX / 15)) + "deg"
+                }
+            }
+            LaikeBtn.onmouseup = function(event) {
+                LaikeBtnSizeAdd = 64
+                LaikePermaBtnSizeAdd = 32
+                Laikes += 1
+                new AddText(event.clientX, event.clientY, 1)
+                WantedBgHue = 127
+            }
+
+
+            DesLaikeBtn.onmouseenter = function() {
+                PermaDesLaikeBtnSizeAdd = 32
+            }
+            DesLaikeBtn.onmouseout = function() {
+                PermaDesLaikeBtnSizeAdd = 0
+            }
+            DesLaikeBtn.onmousedown = function() {
+                PermaDesLaikeBtnSizeAdd = -32
+                DesLaikeBtn.style.rotate = "0deg"
+            }
+            DesLaikeBtn.onmousemove = function(event) {
+                if (event instanceof MouseEvent) {
+                    DesLaikeBtn.style.rotate = String(Number(DesLaikeBtn.style.rotate.replace("deg", "")) + (event.movementX / 15)) + "deg"
+                }
+            }
+            DesLaikeBtn.onmouseup = function() {
+                DesLaikeBtnSizeAdd = 64
+                PermaDesLaikeBtnSizeAdd = 32
+                Laikes -= 1
+                new AddText(event.clientX, event.clientY, -1)
+                WantedBgHue = 0
+            }
+
+
+            document.children[0].children[1].appendChild(LaikeBtn)
+            document.children[0].children[1].appendChild(DesLaikeBtn)
+            document.children[0].children[1].appendChild(LaikeText)
+
+
+            function GetSiteScale() {
+                return Math.min(window.outerWidth / 1280, window.outerHeight / 720)
+            }
+
+
+            function SiteLoop(CurrentTime) {
+                Delta = (CurrentTime - OldTime) / 1000
+                OldTime = CurrentTime
+
+
+                const Scl = GetSiteScale()
+
+
+                LaikeBtn.style.width = String((512 + LaikeBtnSizeAdd) * Scl) + "px"
+                LaikeBtn.style.height = String((256 + LaikeBtnSizeAdd) * Scl) + "px"
+                LaikeBtn.style.fontSize = String((96 + (LaikeBtnSizeAdd / 2)) * Scl) + "px"
+                DesLaikeBtn.style.width = String((512 + DesLaikeBtnSizeAdd) * Scl) + "px"
+                DesLaikeBtn.style.height = String((256 + DesLaikeBtnSizeAdd) * Scl) + "px"
+                DesLaikeBtn.style.fontSize = String((96 + (DesLaikeBtnSizeAdd / 2)) * Scl) + "px"
+
+
+                for (var a=0; a < AddTexts.length; a++) {
+                    const txt = AddTexts[a]
+                    txt.Update()
+                    txt.Draw()
+                }
+
+
+                document.children[0].children[1].style.background = "hsl(" + String(BgHue) + ", 100%, " + String(75 + 25 * Math.cos(Time)) + "%)"
+
+
+                LaikeBtnSizeAdd = SLerp(LaikeBtnSizeAdd, LaikePermaBtnSizeAdd, 12)
+                DesLaikeBtnSizeAdd = SLerp(DesLaikeBtnSizeAdd, PermaDesLaikeBtnSizeAdd, 12)
+                LaikeBtn.style.rotate = String(SLerp(Number(LaikeBtn.style.rotate.replace("deg", "")), 0, 6)) + "deg"
+                DesLaikeBtn.style.rotate = String(SLerp(Number(DesLaikeBtn.style.rotate.replace("deg", "")), 0, 6)) + "deg"
+                LaikeText.textContent = "LAIKES: " + String(Laikes)
+                BgHue = SLerp(BgHue, WantedBgHue, 3)
+                Time += 1 * Delta
+                requestAnimationFrame(SiteLoop)
+            }
+
+
+            function SLerp(a, b, force) {
+                return a + (b - a) * (1 - Math.exp(-force * Delta))
+            }
+            function GetRandom(min, max) {
+                return Math.random() * (max - min) + min
+            }
+            requestAnimationFrame(SiteLoop)
+        </script>
+    </body>
+</html>
