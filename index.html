@@ -24,6 +24,8 @@
             var Laikes = 0
             var Time = 0
             var AddTexts = []
+            var LAIKEimg = createImage("./pixil-frame-0.png")
+            LaikeBtn.innerHTML = '<img src="./pixil-frame-0.png" alt="" width="16">'
 
 
             class AddText {
@@ -218,6 +220,18 @@
             }
             function GetRandom(min, max) {
                 return Math.random() * (max - min) + min
+            }
+            function createImage(src, width, height, alt) {
+                let img = document.createElement("img");
+
+
+                img.src = src;
+                img.width = width;
+                img.height = height;
+                img.alt = alt;
+
+
+                return img;
             }
             requestAnimationFrame(SiteLoop)
         </script>
